@@ -10,7 +10,7 @@ import SwiftUI
 
 
 struct ContentView: View {
-    let people = ["Finn", "Leia", "Luke", "Rey"]
+    let people = ["Finn", "Leia", "Luke", "Rey", "John"]
     
     
     
