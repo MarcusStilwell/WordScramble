@@ -17,6 +17,7 @@ struct ContentView: View {
     @State private var errorTitle = ""
     @State private var errorMessage = ""
     @State private var showingError = false
+    @State private var currentScore = 0
     
     func startGame() {
         // 1. Find the URL for start.txt in our app bundle
@@ -28,8 +29,15 @@ struct ContentView: View {
 
                 // 4. Pick one random word, or use "silkworm" as a sensible default
                 rootWord = allWords.randomElement() ?? "silkworm"
-
+                
+                
+                //5. Reset score
+                currentScore = 0
+                
+                //6. Clear used words from screen
+                usedWords = []
                 // If we are here everything has worked, so we can exit
+                
                 return
             }
         }
@@ -61,7 +69,7 @@ struct ContentView: View {
             wordError(title: "Word not possible", message: "That isn't a real word.")
             return
         }
-
+        currentScore += answer.count
         usedWords.insert(answer, at: 0)
         newWord = ""
     }
@@ -89,8 +97,13 @@ struct ContentView: View {
         let checker = UITextChecker()
         let range = NSRange(location: 0, length: word.utf16.count)
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
-
-        return misspelledRange.location == NSNotFound
+        
+        if word.count < 3{
+            return false
+        }
+        else{
+            return misspelledRange.location == NSNotFound
+        }
     }
     
     func wordError(title: String, message: String) {
@@ -99,15 +112,23 @@ struct ContentView: View {
         showingError = true
     }
     
-    
     var body: some View {
         NavigationView {
             VStack {
                 TextField("Enter your word", text: $newWord, onCommit: addNewWord).autocapitalization(.none)
+                    .toolbar{
+                        ToolbarItem(placement: .navigationBarLeading){
+                            Button(action: startGame){
+                                Text("New Game")
+                            }
+                        }
+                    }
                 List(usedWords, id: \.self) {
                     Image(systemName: "\($0.count).circle")
                     Text($0)
                 }
+                Text("\(currentScore)")
+                
                 
             }
             .textFieldStyle(RoundedBorderTextFieldStyle())
